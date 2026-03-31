@@ -16,6 +16,13 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* GLOBAL BACKGROUND + TEXT COLOR */
+@layer base {
+  body {
+    @apply bg-gradient-to-b from-[#000000] via-[#020617] to-[#0a1a2f] text-white overflow-x-hidden;
+  }
+}
+
 /* Neutral link behavior */
 a {
   text-decoration: none;
@@ -26,9 +33,4 @@ a {
 img, svg {
   display: block;
   max-width: 100%;
-}
-
-/* Prevent horizontal scroll */
-body {
-  overflow-x: hidden;
 }

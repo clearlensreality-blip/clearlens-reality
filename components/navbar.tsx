@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Navbar() {
   return (
-    <nav className="w-full h-20 px-14 flex items-center justify-between fixed top-0 left-0 z-50 bg-[#0F1F33] shadow-lg shadow-black/30">
+    <nav className="w-full h-20 px-14 flex items-center justify-between fixed top-0 left-0 z-50 bg-transparent shadow-lg shadow-black/30">
       
       {/* Logo */}
       <div className="flex items-center">
