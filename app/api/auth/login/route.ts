@@ -1,3 +1,3 @@
 export async function POST(req: Request) {
-  return Response.json({ message: "Login route working" });
+  return Response.json({ status: "ok", message: "Login route working" });
 }
