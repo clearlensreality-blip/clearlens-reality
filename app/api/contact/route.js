@@ -1,34 +1,26 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 export async function POST(req) {
-  const { name, email, message } = await req.json();
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.CONTACT_EMAIL,
-      pass: process.env.CONTACT_PASSWORD,
-    },
-  });
-
-  const mailOptions = {
-    from: email,
-    to: process.env.CONTACT_EMAIL,
-    subject: `New Contact Request from ${name}`,
-    text: `
-Name: ${name}
-Email: ${email}
-
-Message:
-${message}
-    `,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    return new Response("OK", { status: 200 });
+    const { name, email, message } = await req.json();
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    await resend.emails.send({
+      from: "ClearLens Reality <onboarding@resend.dev>",
+      to: "clearlensreality@gmail.com",
+      subject: `New message from ${name}`,
+      html: `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <p>${message}</p>
+      `,
+    });
+
+    return Response.json({ success: true });
   } catch (error) {
     console.error(error);
-    return new Response("Error", { status: 500 });
+    return Response.json({ error: "Email failed" }, { status: 500 });
   }
 }
