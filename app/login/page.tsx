@@ -4,10 +4,10 @@ import Button from "@/components/button";
 
 export default function LoginPage() {
   return (
-    <div className="w-full space-y-20">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center space-y-20">
 
       {/* HERO */}
-      <section className="space-y-4">
+      <section className="space-y-4 text-center">
         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
           Login
         </h1>
