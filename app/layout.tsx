@@ -72,12 +72,26 @@ export default function RootLayout({ children }) {
               </ul>
             </div>
 
-            {/* CONTACT */}
+            {/* CONTACT (Option E) */}
             <div>
               <h3 className="text-white font-semibold mb-4">Contact</h3>
-              <ul className="space-y-2 text-sm">
-                <li>Email: support@clearlensreality.com</li>
-                <li>Location: United Kingdom</li>
+              <ul className="space-y-3 text-sm">
+
+                <li className="flex items-center">
+                  <i className="fa-solid fa-envelope mr-3 text-blue-400"></i>
+                  support@clearlensreality.com
+                </li>
+
+                <li className="flex items-center">
+                  <i className="fa-solid fa-location-dot mr-3 text-blue-400"></i>
+                  United Kingdom
+                </li>
+
+                <li className="flex items-center">
+                  <i className="fa-solid fa-phone mr-3 text-blue-400"></i>
+                  +44 0000 000000
+                </li>
+
               </ul>
             </div>
 
