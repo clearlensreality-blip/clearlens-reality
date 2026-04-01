@@ -4,10 +4,10 @@ import Button from "@/components/button";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start pt-40 space-y-20">
+    <div className="min-h-screen w-full flex flex-col items-center pt-48">
 
       {/* HERO */}
-      <section className="space-y-4 text-center">
+      <section className="space-y-4 text-center mb-16">
         <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
           Login
         </h1>
@@ -37,7 +37,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Full-width button fix */}
+          {/* Full-width button */}
           <div className="w-full">
             <Button href="#" className="w-full">Login</Button>
           </div>
