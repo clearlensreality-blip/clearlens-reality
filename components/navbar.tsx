@@ -38,6 +38,22 @@ export default function Navbar() {
           Dashboard
         </a>
 
+        {/* NEW: About */}
+        <a
+          href="/about"
+          className="px-6 py-3 rounded-full bg-black text-white font-semibold hover:bg-neutral-900 transition-all shadow-md"
+        >
+          About
+        </a>
+
+        {/* NEW: Contact Us */}
+        <a
+          href="/contact"
+          className="px-6 py-3 rounded-full bg-black text-white font-semibold hover:bg-neutral-900 transition-all shadow-md"
+        >
+          Contact Us
+        </a>
+
         <a
           href="/login"
           className="px-6 py-3 rounded-full bg-white text-black font-semibold hover:bg-neutral-200 transition-all shadow-md"

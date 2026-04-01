@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function Home() {
   return (
@@ -86,6 +87,9 @@ export default function Home() {
         <footer className="py-10 text-center text-blue-300/70 text-sm">
           © {new Date().getFullYear()} Clear Lens Reality. All rights reserved.
         </footer>
+
+        {/* Analytics only on the home page */}
+        <Analytics />
 
       </main>
     </div>
