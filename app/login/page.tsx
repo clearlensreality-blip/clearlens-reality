@@ -4,7 +4,7 @@ import Button from "@/components/button";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center pt-32 space-y-20">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start pt-40 space-y-20">
 
       {/* HERO */}
       <section className="space-y-4 text-center">
@@ -18,7 +18,7 @@ export default function LoginPage() {
       </section>
 
       {/* FORM */}
-      <section className="w-full p-8 rounded-xl bg-blue-600 border border-blue-900/40 shadow-lg shadow-black/40 max-w-xl">
+      <section className="w-full max-w-xl p-8 rounded-xl bg-blue-600 border border-blue-900/40 shadow-lg shadow-black/40">
         <form className="space-y-6">
 
           <div>
@@ -37,7 +37,11 @@ export default function LoginPage() {
             />
           </div>
 
-          <Button href="#">Login</Button>
+          {/* Full-width button fix */}
+          <div className="w-full">
+            <Button href="#" className="w-full">Login</Button>
+          </div>
+
         </form>
       </section>
 
