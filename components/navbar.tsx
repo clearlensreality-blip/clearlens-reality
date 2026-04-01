@@ -10,13 +10,15 @@ export default function Navbar() {
 
       {/* Logo */}
       <div className="flex items-center">
-        <Image
-          src="/logo.png"
-          alt="ClearLens Reality Logo"
-          width={100}
-          height={100}
-          className="object-contain"
-        />
+        <a href="/" className="cursor-pointer">
+          <Image
+            src="/logo.png"
+            alt="ClearLens Reality Logo"
+            width={100}
+            height={100}
+            className="object-contain"
+          />
+        </a>
       </div>
 
       {/* Hamburger (mobile only) */}
