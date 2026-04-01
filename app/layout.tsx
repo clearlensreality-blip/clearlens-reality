@@ -42,10 +42,10 @@ export default function RootLayout({ children }) {
                   <i className="fa-brands fa-instagram text-xl"></i>
                 </a>
                 <a href="#" className="hover:text-white transition">
-                  <i className="fa-brands fa-github text-xl"></i>
+                  <i className="fa-brands fa-facebook text-xl"></i>
                 </a>
                 <a href="#" className="hover:text-white transition">
-                  <i className="fa-brands fa-linkedin text-xl"></i>
+                  <i className="fa-brands fa-tiktok text-xl"></i>
                 </a>
               </div>
             </div>
