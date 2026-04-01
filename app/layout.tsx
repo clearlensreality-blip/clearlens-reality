@@ -79,7 +79,7 @@ export default function RootLayout({ children }) {
 
                 <li className="flex items-center">
                   <i className="fa-solid fa-envelope mr-3 text-blue-400"></i>
-                  support@clearlensreality.com
+                  clearlensreality@gmail.com
                 </li>
 
                 <li className="flex items-center">
