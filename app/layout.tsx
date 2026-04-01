@@ -1,5 +1,5 @@
 import "./globals.css";
-import Navbar from "../components/navbar"; // <-- add this
+import Navbar from "../components/navbar";
 
 export const metadata = {
   title: "Clear Lens Reality",
@@ -17,7 +17,8 @@ export default function RootLayout({ children }) {
         />
       </head>
 
-      <body>
+      {/* Add padding so content doesn't hide behind navbar */}
+      <body className="pt-24">
 
         {/* GLOBAL NAVBAR */}
         <Navbar />
