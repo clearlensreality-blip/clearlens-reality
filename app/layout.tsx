@@ -1,4 +1,5 @@
 import "./globals.css";
+import Navbar from "../components/navbar"; // <-- add this
 
 export const metadata = {
   title: "Clear Lens Reality",
@@ -17,6 +18,9 @@ export default function RootLayout({ children }) {
       </head>
 
       <body>
+
+        {/* GLOBAL NAVBAR */}
+        <Navbar />
 
         {/* PAGE CONTENT */}
         {children}
@@ -72,7 +76,7 @@ export default function RootLayout({ children }) {
               </ul>
             </div>
 
-            {/* CONTACT (Option E) */}
+            {/* CONTACT */}
             <div>
               <h3 className="text-white font-semibold mb-4">Contact</h3>
               <ul className="space-y-3 text-sm">
