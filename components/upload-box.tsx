@@ -14,11 +14,15 @@ export default function UploadBox({ onUpload }: UploadBoxProps) {
     if (!file) return;
 
     const reader = new FileReader();
+
     reader.onload = () => {
       if (typeof reader.result === "string") {
+        // This sends the exact same format as the camera:
+        // "data:image/jpeg;base64,AAAA..."
         onUpload(reader.result);
       }
     };
+
     reader.readAsDataURL(file);
   }
 

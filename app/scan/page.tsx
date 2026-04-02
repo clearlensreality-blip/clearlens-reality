@@ -30,11 +30,10 @@ export default function ScanPage() {
 
       const data = await res.json();
 
-      // Wrap result so ResultsPanel doesn't crash
       setResults({
         part: "AI Analysis",
         confidence: 100,
-        steps: [data.result || "No result returned"],
+        steps: [data.result || "No description generated."],
       });
     } catch (err) {
       console.error(err);
