@@ -28,10 +28,20 @@ export default function ScanPage() {
       });
 
       const data = await res.json();
-      setResults(data);
+
+      // Wrap Gemini output so your ResultsPanel doesn't crash
+      setResults({
+        part: "AI Analysis",
+        confidence: 100,
+        steps: [data.result || "No result returned"],
+      });
     } catch (err) {
       console.error(err);
-      setResults({ error: "Failed to scan image" });
+      setResults({
+        part: "Error",
+        confidence: 0,
+        steps: ["Failed to scan image"],
+      });
     }
 
     setLoading(false);
