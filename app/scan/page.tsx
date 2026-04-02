@@ -18,18 +18,19 @@ export default function ScanPage() {
     setResults(null);
 
     try {
-      // Extract base64 from data URL
-      const base64 = img.split(",")[1];
+      // Extract base64 + mime type
+      const [header, base64] = img.split(",");
+      const mimeType = header.match(/data:(.*);base64/)?.[1] || "image/jpeg";
 
       const res = await fetch("/api/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: base64 }),
+        body: JSON.stringify({ image: base64, mimeType }),
       });
 
       const data = await res.json();
 
-      // Wrap Gemini output so your ResultsPanel doesn't crash
+      // Wrap result so ResultsPanel doesn't crash
       setResults({
         part: "AI Analysis",
         confidence: 100,
@@ -70,12 +71,10 @@ export default function ScanPage() {
       {/* SCAN PANEL */}
       <section className="w-full p-8 rounded-xl bg-gradient-to-br from-black via-neutral-900 to-blue-950 border border-blue-900/40 shadow-lg shadow-black/40 space-y-8">
 
-        {/* EMPTY STATE */}
         {!capturedImage && !loading && !results && (
           <UploadBox onUpload={handleImageCapture} />
         )}
 
-        {/* RESULTS PANEL */}
         {(capturedImage || loading || results) && (
           <ResultsPanel
             image={capturedImage}
@@ -84,7 +83,6 @@ export default function ScanPage() {
           />
         )}
 
-        {/* BUTTONS */}
         <div className="flex gap-4">
           <Button onClick={() => setCameraOpen(true)} className="flex-1">
             Use Camera
@@ -98,7 +96,6 @@ export default function ScanPage() {
         </div>
       </section>
 
-      {/* CAMERA MODAL */}
       <CameraModal
         open={cameraOpen}
         onClose={() => setCameraOpen(false)}

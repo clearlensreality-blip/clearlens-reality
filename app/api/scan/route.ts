@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { image } = await req.json();
+    const { image, mimeType } = await req.json();
 
     if (!image) {
       return NextResponse.json(
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
                 {
                   inlineData: {
                     data: image,
-                    mimeType: "image/jpeg",
+                    mimeType: mimeType,
                   },
                 },
               ],
