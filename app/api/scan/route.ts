@@ -46,6 +46,9 @@ export async function POST(req: Request) {
 
     const data = await geminiRes.json();
 
+    // ⭐ This prints the REAL Gemini response into Vercel logs
+    console.log("GEMINI RAW RESPONSE:", JSON.stringify(data, null, 2));
+
     const text =
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No description generated.";
