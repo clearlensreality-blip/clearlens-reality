@@ -17,21 +17,24 @@ export default function ScanPage() {
     setLoading(true);
     setResults(null);
 
-    // Simulated AI processing
-    setTimeout(() => {
-      setResults({
-        part: "Alternator",
-        confidence: 92,
-        steps: [
-          "Disconnect the battery",
-          "Remove the serpentine belt",
-          "Unbolt the alternator",
-          "Install the new unit",
-          "Reconnect everything and test"
-        ]
+    try {
+      // Extract base64 from data URL
+      const base64 = img.split(",")[1];
+
+      const res = await fetch("/api/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 }),
       });
-      setLoading(false);
-    }, 2000);
+
+      const data = await res.json();
+      setResults(data);
+    } catch (err) {
+      console.error(err);
+      setResults({ error: "Failed to scan image" });
+    }
+
+    setLoading(false);
   }
 
   function resetScan() {
