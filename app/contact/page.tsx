@@ -5,11 +5,13 @@ import { useState } from "react";
 export default function ContactPage() {
   const [status, setStatus] = useState("");
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("Sending...");
 
-    const formData = new FormData(e.target);
+    // Correctly typed form reference
+    const form = e.currentTarget;
+    const formData = new FormData(form);
 
     const res = await fetch("/api/contact", {
       method: "POST",
@@ -22,7 +24,7 @@ export default function ContactPage() {
 
     if (res.ok) {
       setStatus("Message sent!");
-      e.target.reset();
+      form.reset(); // Correctly typed reset()
     } else {
       setStatus("Something went wrong.");
     }
