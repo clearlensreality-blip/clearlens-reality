@@ -1,27 +1,29 @@
 import "./globals.css";
 import Navbar from "../components/navbar";
-import { ClerkProvider } from "@clerk/nextjs";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "Clear Lens Reality",
   description: "See life through a clearer lens.",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <head>
-          {/* Font Awesome for social icons */}
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-          />
-        </head>
+    <html lang="en">
+      <head>
+        {/* Font Awesome for social icons */}
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
+      </head>
 
-        {/* Add padding so content doesn't hide behind navbar */}
-        <body className="pt-24">
-
+      <body className="pt-24">
+        <Providers>
           {/* GLOBAL NAVBAR */}
           <Navbar />
 
@@ -110,10 +112,8 @@ export default function RootLayout({ children }) {
             </div>
 
           </footer>
-
-        </body>
-      </html>
-    </ClerkProvider>
+        </Providers>
+      </body>
+    </html>
   );
 }
-
