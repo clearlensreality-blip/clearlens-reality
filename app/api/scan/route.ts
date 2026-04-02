@@ -20,8 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // ⭐ Correct model for v1 API
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
 
     const data = await geminiRes.json();
 
-    // Log Gemini’s real response
+    // Debug log so we can see Gemini's real output
     console.log("GEMINI RAW RESPONSE:", JSON.stringify(data, null, 2));
 
     const text =
