@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ result: text });
   } catch (err) {
-    console.error(err);
+    console.error("SCAN ERROR:", err);
     return NextResponse.json(
       { error: "Failed to process image" },
       { status: 500 }
