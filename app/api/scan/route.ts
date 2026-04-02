@@ -20,9 +20,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // ⭐ Use v1beta for image support
+    // ⭐ Gemini 3 Flash (your screenshot confirms this model exists)
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
