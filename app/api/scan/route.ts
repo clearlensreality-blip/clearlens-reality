@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
 
     const data = await geminiRes.json();
 
-    // ⭐ This prints the REAL Gemini response into Vercel logs
+    // Log Gemini’s real response
     console.log("GEMINI RAW RESPONSE:", JSON.stringify(data, null, 2));
 
     const text =
