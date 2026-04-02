@@ -21,19 +21,20 @@ export async function POST(req: Request) {
     }
 
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [
             {
+              role: "user",
               parts: [
-                { text: "Describe this image in detailed structured format." },
+                { text: "Describe this image in detail." },
                 {
-                  inlineData: {
+                  inline_data: {
+                    mime_type: mimeType,
                     data: image,
-                    mimeType: mimeType,
                   },
                 },
               ],
