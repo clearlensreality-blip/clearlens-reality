@@ -282,7 +282,7 @@ export default function CameraModal({ isOpen, onClose, onCapture }: CameraModalP
 
       <button
         onClick={handleShutterPress}
-        className="w-[84px] h-[84px] rounded-full bg-white border-[6px] border-white shadow-xl active:scale-95 transition"
+        className="w-[72px] h-[64px] rounded-full bg-white border-[6px] border-white shadow-xl active:scale-95 transition"
       />
 
       <button onClick={toggleCamera} className="text-white">
