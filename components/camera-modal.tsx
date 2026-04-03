@@ -28,6 +28,17 @@ export default function CameraModal({ open, onClose, onCapture }: CameraModalPro
   const isAndroid = /android/.test(ua);
   const isDesktop = !isIOS && !isAndroid;
 
+  // Disable background scroll + clicks
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+      document.body.style.pointerEvents = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.pointerEvents = "";
+    }
+  }, [open]);
+
   // Load cameras
   async function loadCameras() {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -51,21 +62,26 @@ export default function CameraModal({ open, onClose, onCapture }: CameraModalPro
     }
   }
 
-  // Generate zoom presets (hardware + fallback)
+  // Generate 5 zoom presets (hardware + fallback)
   function generateZoomPresets(mediaStream: MediaStream) {
     try {
       const track = mediaStream.getVideoTracks()[0];
-      const caps: any = track.getCapabilities(); // SAFE FIX
+      const caps: any = track.getCapabilities();
 
       if (caps.zoom && caps.zoom.min !== undefined) {
-        const { min, max, step } = caps.zoom;
-        const presets: number[] = [];
+        const { min, max } = caps.zoom;
 
-        for (let z = min; z <= max; z += step) {
-          presets.push(Number(z.toFixed(1))); // round to 1 decimal
-        }
+        const presets = [
+          Number(min.toFixed(1)),
+          Number((min + (max - min) * 0.25).toFixed(1)),
+          Number((min + (max - min) * 0.5).toFixed(1)),
+          Number((min + (max - min) * 0.75).toFixed(1)),
+          Number(max.toFixed(1)),
+        ];
 
-        setZoomPresets(presets);
+        const unique = Array.from(new Set(presets)).sort((a, b) => a - b);
+
+        setZoomPresets(unique);
         return;
       }
     } catch {}
@@ -202,8 +218,10 @@ export default function CameraModal({ open, onClose, onCapture }: CameraModalPro
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col justify-between z-50">
-
+    <div
+      className="fixed inset-0 bg-black flex flex-col justify-between z-50"
+      style={{ pointerEvents: "auto" }}
+    >
       {/* Video */}
       <video
         ref={videoRef}
