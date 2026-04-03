@@ -83,18 +83,21 @@ export default function ScanPage() {
           </Button>
 
           {(capturedImage || results) && (
-            <Button onClick={resetScan} className="flex-1 bg-neutral-700 hover:bg-neutral-600">
+            <Button
+              onClick={resetScan}
+              className="flex-1 bg-neutral-700 hover:bg-neutral-600"
+            >
               Rescan
             </Button>
           )}
         </div>
       </section>
 
-      <CameraModal
-        open={cameraOpen}
-        onClose={() => setCameraOpen(false)}
-        onCapture={handleImageCapture}
-      />
+     <CameraModal
+  isOpen={cameraOpen}
+  onClose={() => setCameraOpen(false)}
+  onCapture={() => setCameraOpen(false)}   // ✔ closes modal
+/>
     </div>
   );
 }

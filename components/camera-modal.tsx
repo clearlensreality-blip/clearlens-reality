@@ -1,292 +1,310 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  MdFlashOn,
+  MdTimer,
+  MdAspectRatio,
+  MdSettings,
+  MdCameraswitch,
+  MdClose,
+} from "react-icons/md";
+
+type CameraMode = "portrait" | "photo" | "video" | "more";
 
 interface CameraModalProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
-  onCapture: (image: string) => void;
+  onCapture: () => void; // closes modal
 }
 
-export default function CameraModal({ open, onClose, onCapture }: CameraModalProps) {
+export default function CameraModal({ isOpen, onClose, onCapture }: CameraModalProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
-  const [cameraIndex, setCameraIndex] = useState(0);
-
+  const [mode, setMode] = useState<CameraMode>("photo");
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("environment");
+  const [isRecording, setIsRecording] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const zoomRef = useRef(1);
-  const initialDistanceRef = useRef<number | null>(null);
-  const uiLockedRef = useRef(false);
+  const [supportsHardwarePortrait, setSupportsHardwarePortrait] = useState(false);
 
-  const zoomPresets = [0.5, 1, 2, 5]; // FINAL FIXED PRESETS
-
-  // Device detection
-  const ua = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase() : "";
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
-  const isDesktop = !isIOS && !isAndroid;
-
-  // Disable background scroll + clicks + page zoom
+  // Detect capabilities
   useEffect(() => {
-    function preventPageZoom(e: TouchEvent) {
-      if (e.touches.length > 1) e.preventDefault();
+    async function detectCapabilities() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const hasDepthCamera = devices.some((d) =>
+          d.label.toLowerCase().includes("depth")
+        );
+        setSupportsHardwarePortrait(hasDepthCamera);
+      } catch (err) {
+        console.warn("Capability detection failed:", err);
+      }
     }
-
-    if (open) {
-      document.body.style.overflow = "hidden";
-      document.body.style.pointerEvents = "none";
-      document.addEventListener("touchmove", preventPageZoom, { passive: false });
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.pointerEvents = "";
-      document.removeEventListener("touchmove", preventPageZoom);
-    }
-  }, [open]);
-
-  // Load cameras
-  async function loadCameras() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter((d) => d.kind === "videoinput");
-    setCameras(videoDevices);
-  }
+    detectCapabilities();
+  }, []);
 
   // Start camera
-  async function startCamera(deviceId?: string) {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          deviceId,
-          width: { ideal: 3840 }, // 4K preferred
-          height: { ideal: 2160 },
-          aspectRatio: { ideal: 16 / 9 },
-        },
-      });
-
-      setStream(mediaStream);
-      if (videoRef.current) videoRef.current.srcObject = mediaStream;
-    } catch (err) {
-      console.error("Camera error:", err);
-    }
-  }
-
-  // Handle modal open
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
 
-    loadCameras().then(() => {
-      const deviceId = cameras[cameraIndex]?.deviceId;
-      startCamera(deviceId);
-    });
+    async function startCamera() {
+      try {
+        const constraints: MediaStreamConstraints = {
+          video: {
+            facingMode,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 30 },
+          },
+          audio: mode === "video",
+        };
 
-    const video = videoRef.current;
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current = stream;
 
-    if (video) {
-      video.addEventListener("touchstart", handleTouchStart);
-      video.addEventListener("touchmove", handleTouchMove);
-      video.addEventListener("touchend", handleTouchEnd);
-      video.addEventListener("click", handleTapFocus);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
+      } catch (err) {
+        console.error("Camera start failed:", err);
+      }
     }
+
+    startCamera();
 
     return () => {
-      stream?.getTracks().forEach((track) => track.stop());
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, [isOpen, facingMode, mode]);
 
-      if (video) {
-        video.removeEventListener("touchstart", handleTouchStart);
-        video.removeEventListener("touchmove", handleTouchMove);
-        video.removeEventListener("touchend", handleTouchEnd);
-        video.removeEventListener("click", handleTapFocus);
+  // Toggle camera
+  const toggleCamera = () => {
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+  };
+
+  // Photo capture (no return — just close modal)
+  const capturePhoto = () => {
+    console.log("Photo captured");
+    onCapture(); // closes modal
+  };
+
+  // Video recording
+  const startRecording = () => {
+    if (!streamRef.current) return;
+
+    const recorder = new MediaRecorder(streamRef.current, {
+      mimeType: "video/webm;codecs=vp9",
+    });
+
+    const chunks: BlobPart[] = [];
+
+    recorder.ondataavailable = (e) => chunks.push(e.data);
+
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "video/webm" });
+      console.log("Video recorded:", blob);
+      onCapture(); // close modal after recording
+    };
+
+    recorder.start();
+    mediaRecorderRef.current = recorder;
+    setIsRecording(true);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  // Portrait mode
+  const capturePortrait = () => {
+    console.log("Portrait captured");
+    onCapture();
+  };
+
+  // Shutter logic
+  const handleShutterPress = () => {
+    if (mode === "photo") capturePhoto();
+    if (mode === "portrait") capturePortrait();
+
+    if (mode === "video") {
+      if (!isRecording) startRecording();
+      else stopRecording();
+    }
+  };
+
+  // Tap to focus (visual only)
+  const handleTapToFocus = (e: React.MouseEvent) => {
+    const ring = document.createElement("div");
+    ring.className =
+      "absolute w-20 h-20 border-2 border-white rounded-full pointer-events-none animate-ping";
+    ring.style.left = `${e.clientX - 40}px`;
+    ring.style.top = `${e.clientY - 40}px`;
+    ring.style.zIndex = "30";
+
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 600);
+  };
+
+  // Pinch to zoom
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let initialDistance = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        initialDistance = Math.sqrt(dx * dx + dy * dy);
       }
     };
-  }, [open, cameraIndex, cameras.length]);
 
-  // Capture
-  function handleCapture() {
-    if (!videoRef.current || !canvasRef.current) return;
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const newDistance = Math.sqrt(dx * dx + dy * dy);
 
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const imageData = canvas.toDataURL("image/png");
-    onCapture(imageData);
-    onClose();
-  }
-
-  // Switch camera
-  function switchCamera() {
-    if (cameras.length < 2) return;
-    setCameraIndex((prev) => (prev + 1) % cameras.length);
-  }
-
-  // Pinch zoom
-  function getDistance(touches: TouchList) {
-    const [a, b] = [touches[0], touches[1]];
-    const dx = a.clientX - b.clientX;
-    const dy = a.clientY - b.clientY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function handleTouchStart(e: TouchEvent) {
-    if (e.touches.length === 2) {
-      initialDistanceRef.current = getDistance(e.touches);
-      uiLockedRef.current = true;
-    }
-  }
-
-  function handleTouchMove(e: TouchEvent) {
-    if (e.touches.length === 2 && initialDistanceRef.current) {
-      const newDistance = getDistance(e.touches);
-      const scale = newDistance / initialDistanceRef.current;
-
-      const sensitivity = isIOS ? 0.6 : isAndroid ? 1.0 : 0.4;
-      const newZoom = Math.min(Math.max(0.5, zoomRef.current * (1 + (scale - 1) * sensitivity)), 5);
-
-      setZoom(newZoom);
-      if (videoRef.current) {
-        videoRef.current.style.transform = `scale(${newZoom})`;
+        const zoomFactor = newDistance / initialDistance;
+        const newZoom = Math.min(5, Math.max(0.5, zoom * zoomFactor));
+        setZoom(newZoom);
       }
+    };
+
+    video.addEventListener("touchstart", onTouchStart);
+    video.addEventListener("touchmove", onTouchMove);
+
+    return () => {
+      video.removeEventListener("touchstart", onTouchStart);
+      video.removeEventListener("touchmove", onTouchMove);
+    };
+  }, [zoom]);
+
+  // Apply zoom to camera track
+  useEffect(() => {
+    const track = streamRef.current
+      ?.getVideoTracks()
+      ?.find((t) => {
+        const caps = t.getCapabilities?.() as any;
+        return caps && "zoom" in caps;
+      });
+
+    if (!track) return;
+
+    try {
+      (track as any).applyConstraints({
+        advanced: [{ zoom }],
+      });
+    } catch (err) {
+      console.warn("Zoom not supported:", err);
     }
-  }
+  }, [zoom]);
 
-  function handleTouchEnd() {
-    zoomRef.current = zoom;
-    initialDistanceRef.current = null;
-    uiLockedRef.current = false;
-  }
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
 
-  // Tap to focus (UI only)
-  function handleTapFocus(e: MouseEvent) {
-    if (isDesktop) return;
+  // Click to focus
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
-    const x = e.clientX;
-    const y = e.clientY;
+    const handleClick = (e: MouseEvent) => {
+      handleTapToFocus(e as any);
+    };
 
-    const focus = document.createElement("div");
-    focus.style.position = "fixed";
-    focus.style.left = `${x - 40}px`;
-    focus.style.top = `${y - 40}px`;
-    focus.style.width = "80px";
-    focus.style.height = "80px";
-    focus.style.borderRadius = isIOS ? "8px" : "50%";
-    focus.style.border = isIOS ? "2px solid yellow" : "2px solid white";
-    focus.style.opacity = "1";
-    focus.style.pointerEvents = "none";
-    focus.style.transition = "opacity 0.6s ease, transform 0.3s ease";
-    focus.style.transform = "scale(1)";
-    focus.style.zIndex = "9999";
+    video.addEventListener("click", handleClick);
 
-    document.body.appendChild(focus);
+    return () => {
+      video.removeEventListener("click", handleClick);
+    };
+  }, []);
 
-    setTimeout(() => {
-      focus.style.opacity = "0";
-      focus.style.transform = "scale(1.3)";
-    }, 50);
-
-    setTimeout(() => {
-      focus.remove();
-    }, 700);
-  }
-
-  if (!open) return null;
-
-  return (
-    <div
-      className="fixed inset-0 bg-black flex flex-col justify-between z-50"
-      style={{ pointerEvents: "auto" }}
-    >
-      {/* Video */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className={`w-full h-full object-cover transition-transform duration-75 ${
-          isIOS ? "rounded-3xl" : ""
-        }`}
-      />
-
-      <canvas ref={canvasRef} className="hidden" />
-
-      {/* Flip camera */}
-      <div className="absolute top-6 right-6">
-        {cameras.length > 1 && (
-          <button
-            onClick={switchCamera}
-            style={{ pointerEvents: uiLockedRef.current ? "none" : "auto" }}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-7 h-7">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 3h4v4m0-4l-5 5m-5 13H5v-4m0 4l5-5m-5-9a7 7 0 0112 0m0 8a7 7 0 01-12 0" />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* Zoom presets (horizontal row) */}
-      {!isDesktop && (
-        <div className="absolute bottom-28 left-10 flex gap-3">
-          {zoomPresets.map((z) => (
-            <button
-              key={z}
-              onClick={() => {
-                const targetZoom = Math.min(z, 5);
-
-                if (videoRef.current) {
-                  videoRef.current.style.transition = "transform 150ms ease";
-                  videoRef.current.style.transform = `scale(${targetZoom})`;
-
-                  setTimeout(() => {
-                    if (videoRef.current) videoRef.current.style.transition = "";
-                  }, 150);
-                }
-
-                setZoom(targetZoom);
-                zoomRef.current = targetZoom;
-              }}
-              style={{ pointerEvents: uiLockedRef.current ? "none" : "auto" }}
-              className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-md text-white"
-            >
-              {z}×
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Bottom controls */}
-      <div className="absolute bottom-10 left-10 flex items-center gap-6">
-
-        {/* Cancel */}
-        <button
-          onClick={onClose}
-          style={{ pointerEvents: uiLockedRef.current ? "none" : "auto" }}
-          className="text-white text-lg bg-black/40 px-4 py-2 rounded-lg backdrop-blur-md"
-        >
-          Cancel
-        </button>
-
-        {/* Shutter Button */}
-        <button
-          onClick={handleCapture}
-          style={{ pointerEvents: uiLockedRef.current ? "none" : "auto" }}
-          className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.4)] active:scale-95 transition"
-        >
-          <img
-            src="/your-shutter-icon.png"
-            alt="shutter"
-            className="w-16 h-16 opacity-90"
-          />
-        </button>
-
-      </div>
+  // UI components
+  const TopBar = () => (
+    <div className="absolute top-0 left-0 w-full flex justify-between px-6 py-4 z-20 text-white">
+      <MdFlashOn size={28} />
+      <MdTimer size={28} />
+      <MdAspectRatio size={28} />
+      <MdSettings size={28} />
     </div>
   );
+
+  const zoomLevels = [0.5, 1, 2, 5];
+
+  const ZoomBar = () => (
+    <div className="absolute bottom-40 w-full flex justify-center gap-4 z-20">
+      {zoomLevels.map((level) => (
+        <button
+          key={level}
+          onClick={() => setZoom(level)}
+          className={`px-4 py-2 rounded-full text-white text-lg transition ${
+            zoom === level ? "bg-white/30 backdrop-blur" : "bg-black/30"
+          }`}
+        >
+          {level}×
+        </button>
+      ))}
+    </div>
+  );
+
+  const modes: CameraMode[] = ["portrait", "photo", "video", "more"];
+
+  const ModeSelector = () => (
+    <div className="absolute bottom-6 w-full flex justify-center gap-8 text-white text-lg z-20">
+      {modes.map((m) => (
+        <button
+          key={m}
+          onClick={() => setMode(m)}
+          className={`uppercase tracking-wide ${
+            mode === m ? "text-white font-semibold" : "text-white/50"
+          }`}
+        >
+          {m}
+        </button>
+      ))}
+    </div>
+  );
+
+  const BottomBar = () => (
+    <div className="absolute bottom-20 w-full flex justify-between items-center px-10 z-20">
+      <button onClick={onClose} className="text-white">
+        <MdClose size={36} />
+      </button>
+
+      <button
+        onClick={handleShutterPress}
+        className="w-[84px] h-[84px] rounded-full bg-white border-[6px] border-white shadow-xl active:scale-95 transition"
+      />
+
+      <button onClick={toggleCamera} className="text-white">
+        <MdCameraswitch size={36} />
+      </button>
+    </div>
+  );
+
+  // Final render
+  return isOpen ? (
+    <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover"
+        playsInline
+        muted
+      />
+
+      <TopBar />
+      <ZoomBar />
+      <BottomBar />
+      <ModeSelector />
+    </div>
+  ) : null;
 }
