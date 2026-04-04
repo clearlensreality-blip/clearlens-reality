@@ -1,28 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function CookieLogic() {
+export default function CookieBanner() {
+  const [show, setShow] = useState(false);
+
   useEffect(() => {
-    const consent = localStorage.getItem("cookieConsent");
+    const seen = sessionStorage.getItem("cookieBannerSeen");
 
-    if (consent === "accepted") {
-      // Load Google Analytics
-      const script = document.createElement("script");
-      script.src = "https://www.googletagmanager.com/gtag/js?id=YOUR_ID";
-      script.async = true;
-      document.head.appendChild(script);
-
-      // GA init
-      (window as any).dataLayer = (window as any).dataLayer || [];
-      function gtag(...args: any[]) {
-        (window as any).dataLayer.push(args);
-      }
-
-      gtag("js", new Date());
-      gtag("config", "YOUR_ID");
+    if (!seen) {
+      setShow(true);
+      sessionStorage.setItem("cookieBannerSeen", "true");
     }
   }, []);
 
-  return null; // This component renders nothing
+  if (!show) return null;
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-black/80 text-white p-4 text-center">
+      <p>This site uses cookies to improve your experience.</p>
+      <button
+        onClick={() => setShow(false)}
+        className="mt-2 px-4 py-2 bg-blue-600 rounded"
+      >
+        OK
+      </button>
+    </div>
+  );
 }
