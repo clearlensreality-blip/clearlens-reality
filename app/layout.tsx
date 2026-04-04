@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "../components/navbar";
 import { Providers } from "./providers";
+import CookieBanner from "../components/cookiebanner";
 
 export const metadata = {
   title: "Clear Lens Reality",
@@ -112,6 +113,10 @@ export default function RootLayout({
             </div>
 
           </footer>
+
+          {/* COOKIE BANNER */}
+          <CookieBanner />
+
         </Providers>
       </body>
     </html>
