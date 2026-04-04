@@ -1,45 +1,16 @@
-"use client";
-
 import "./globals.css";
 import Navbar from "../components/navbar";
 import { Providers } from "./providers";
 import CookieBanner from "../components/cookiebanner";
 import CookieLogic from "../components/cookielogic";
-import { useEffect } from "react";
+import AnalyticsLoader from "../components/analyticsloader";
 
 export const metadata = {
   title: "Clear Lens Reality",
   description: "See life through a clearer lens.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-
-  useEffect(() => {
-    const consent = localStorage.getItem("cookieConsent");
-
-    if (consent === "accepted") {
-      // Load Google Analytics script
-      const script = document.createElement("script");
-      script.src = "https://www.googletagmanager.com/gtag/js?id=YOUR_ID";
-      script.async = true;
-      document.head.appendChild(script);
-
-      // Initialise dataLayer
-      (window as any).dataLayer = (window as any).dataLayer || [];
-
-      function gtag(...args: any[]) {
-        (window as any).dataLayer.push(args);
-      }
-
-      gtag("js", new Date());
-      gtag("config", "YOUR_ID");
-    }
-  }, []);
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -125,6 +96,9 @@ export default function RootLayout({
           </footer>
 
           <CookieBanner />
+
+          {/* Client-side analytics loader */}
+          <AnalyticsLoader />
         </Providers>
       </body>
     </html>
