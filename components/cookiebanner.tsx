@@ -1,22 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function CookieBanner() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const choice = localStorage.getItem("cookieConsent");
-    if (!choice) setVisible(true);
-  }, []);
+  const [visible, setVisible] = useState(true);
 
   function acceptCookies() {
-    localStorage.setItem("cookieConsent", "accepted");
+    // You can add logic here if needed
     setVisible(false);
   }
 
   function declineCookies() {
-    localStorage.setItem("cookieConsent", "declined");
+    // You can add logic here if needed
     setVisible(false);
   }
 
@@ -25,7 +20,7 @@ export default function CookieBanner() {
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-xl bg-neutral-900 border border-neutral-700 text-white p-4 rounded-xl shadow-xl flex flex-col md:flex-row items-center gap-4 z-[9999]">
       <p className="text-sm text-gray-300 flex-1">
-        We use cookies to improve your experience and analyse usage. You can accept or decline.
+        We use cookies to improve your experience and analyse usage. You can either accept or decline.
       </p>
 
       <div className="flex gap-2">

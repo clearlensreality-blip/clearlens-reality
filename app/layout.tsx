@@ -1,7 +1,10 @@
+"use client";
+
 import "./globals.css";
 import Navbar from "../components/navbar";
 import { Providers } from "./providers";
 import CookieBanner from "../components/cookiebanner";
+import { useEffect } from "react";
 
 export const metadata = {
   title: "Clear Lens Reality",
@@ -13,6 +16,30 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
+ useEffect(() => {
+  const consent = localStorage.getItem("cookieConsent");
+
+  if (consent === "accepted") {
+    // Load Google Analytics script
+    const script = document.createElement("script");
+    script.src = "https://www.googletagmanager.com/gtag/js?id=YOUR_ID";
+    script.async = true;
+    document.head.appendChild(script);
+
+    // Initialise dataLayer
+    (window as any).dataLayer = (window as any).dataLayer || [];
+
+    // Define gtag BEFORE using it
+    function gtag(...args: any[]) {
+      (window as any).dataLayer.push(args);
+    }
+
+    // Now these are valid
+    gtag("js", new Date());
+    gtag("config", "YOUR_ID");
+  }
+}, []);
   return (
     <html lang="en">
       <head>
