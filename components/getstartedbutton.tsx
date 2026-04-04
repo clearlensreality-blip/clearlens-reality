@@ -3,24 +3,24 @@
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
-export default function GetStartedButton({ children, className }: any) {
+export default function GetStartedButton() {
   const { isSignedIn } = useUser();
   const router = useRouter();
 
-  function handleClick() {
+  const handleClick = () => {
     if (isSignedIn) {
       router.push("/dashboard");
     } else {
       router.push("/sign-in");
     }
-  }
+  };
 
   return (
     <button
       onClick={handleClick}
-      className={className}
+      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
     >
-      {children}
+      Get Started
     </button>
   );
 }

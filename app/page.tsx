@@ -1,5 +1,6 @@
 import Navbar from "@/components/navbar";
 import { Analytics } from "@vercel/analytics/next";
+import GetStartedButton from "@/components/getstartedbutton";
 
 export default function Home() {
   return (
@@ -22,12 +23,8 @@ export default function Home() {
           </p>
 
           <div className="mt-10 flex gap-4">
-            <a
-              href="#"
-              className="px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30"
-            >
-              Get Started
-            </a>
+            <GetStartedButton />
+
             <a
               href="#features"
               className="px-6 py-3 rounded-lg border border-blue-500 hover:bg-blue-500/20 transition"
@@ -75,12 +72,8 @@ export default function Home() {
           <p className="text-blue-200 max-w-xl mx-auto mb-10">
             Start your journey with Clear Lens Reality today and take the first step toward clarity.
           </p>
-          <a
-            href="#"
-            className="px-8 py-4 rounded-lg bg-blue-600 hover:bg-blue-700 transition shadow-lg shadow-blue-600/30 text-lg"
-          >
-            Get Started
-          </a>
+
+          <GetStartedButton />
         </section>
 
         {/* Footer */}

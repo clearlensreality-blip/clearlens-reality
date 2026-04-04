@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "../components/navbar";
 import { Providers } from "./providers";
 import CookieBanner from "../components/cookiebanner";
+import CookieLogic from "../components/cookielogic";
 import { useEffect } from "react";
 
 export const metadata = {
@@ -17,33 +18,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
 
- useEffect(() => {
-  const consent = localStorage.getItem("cookieConsent");
+  useEffect(() => {
+    const consent = localStorage.getItem("cookieConsent");
 
-  if (consent === "accepted") {
-    // Load Google Analytics script
-    const script = document.createElement("script");
-    script.src = "https://www.googletagmanager.com/gtag/js?id=YOUR_ID";
-    script.async = true;
-    document.head.appendChild(script);
+    if (consent === "accepted") {
+      // Load Google Analytics script
+      const script = document.createElement("script");
+      script.src = "https://www.googletagmanager.com/gtag/js?id=YOUR_ID";
+      script.async = true;
+      document.head.appendChild(script);
 
-    // Initialise dataLayer
-    (window as any).dataLayer = (window as any).dataLayer || [];
+      // Initialise dataLayer
+      (window as any).dataLayer = (window as any).dataLayer || [];
 
-    // Define gtag BEFORE using it
-    function gtag(...args: any[]) {
-      (window as any).dataLayer.push(args);
+      function gtag(...args: any[]) {
+        (window as any).dataLayer.push(args);
+      }
+
+      gtag("js", new Date());
+      gtag("config", "YOUR_ID");
     }
+  }, []);
 
-    // Now these are valid
-    gtag("js", new Date());
-    gtag("config", "YOUR_ID");
-  }
-}, []);
   return (
     <html lang="en">
       <head>
-        {/* Font Awesome for social icons */}
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -52,25 +51,16 @@ export default function RootLayout({
 
       <body className="pt-24">
         <Providers>
-          {/* GLOBAL NAVBAR */}
           <Navbar />
-
-          {/* PAGE CONTENT */}
           {children}
 
-          {/* GLOBAL FOOTER */}
           <footer className="w-full mt-32 border-t border-white/10 py-12 px-6 text-gray-400">
-
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-
               {/* BRAND */}
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold text-white">ClearLens Reality</h2>
-                <p className="text-sm text-gray-500">
-                  Precision. Clarity. Insight.
-                </p>
+                <p className="text-sm text-gray-500">Precision. Clarity. Insight.</p>
 
-                {/* SOCIAL ICONS */}
                 <div className="flex items-center space-x-4 mt-4">
                   <a href="#" className="hover:text-white transition">
                     <i className="fa-brands fa-twitter text-xl"></i>
@@ -113,37 +103,28 @@ export default function RootLayout({
               <div>
                 <h3 className="text-white font-semibold mb-4">Contact</h3>
                 <ul className="space-y-3 text-sm">
-
                   <li className="flex items-center">
                     <i className="fa-solid fa-envelope mr-3 text-blue-400"></i>
                     clearlensreality@gmail.com
                   </li>
-
                   <li className="flex items-center">
                     <i className="fa-solid fa-location-dot mr-3 text-blue-400"></i>
                     United Kingdom
                   </li>
-
                   <li className="flex items-center">
                     <i className="fa-solid fa-phone mr-3 text-blue-400"></i>
                     +44 0000 000000
                   </li>
-
                 </ul>
               </div>
-
             </div>
 
-            {/* COPYRIGHT */}
             <div className="text-center text-gray-500 text-sm mt-12">
               © {new Date().getFullYear()} ClearLens Reality. All rights reserved.
             </div>
-
           </footer>
 
-          {/* COOKIE BANNER */}
           <CookieBanner />
-
         </Providers>
       </body>
     </html>
