@@ -11,7 +11,7 @@ export default function GetStartedButton() {
     if (isSignedIn) {
       router.push("/dashboard");
     } else {
-      router.push("/sign-in");
+      router.push("/login"); // <-- FIXED
     }
   };
 
